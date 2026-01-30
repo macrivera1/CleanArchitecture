@@ -1,0 +1,308 @@
+﻿<!-- ReconnectModal.razor -->
+<!-- HTML and CSS remain unchanged, directly replace the Script below -->
+
+<dialog id="components-reconnect-modal" data-nosnippet>
+	<div class="glass-panel">
+		<div class="icon-wrapper">
+			<div class="pulse-ring"></div>
+			<svg class="status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+				<path d="M12 2L2 7V17L12 22L22 17V7L12 2Z" stroke-linejoin="round" />
+				<path d="M12 22V12M12 12L2 7M12 12L22 7" stroke-linecap="round" />
+			</svg>
+		</div>
+
+		<div class="content-area">
+			<h3 class="status-title" id="reconnect-title">Connection Lost</h3>
+			<p class="status-desc" id="reconnect-desc">
+				Waiting for server connection...<br />
+				<span class="sub-text">The page will reload automatically.</span>
+			</p>
+		</div>
+
+		<div class="progress-container">
+			<div class="progress-bar"></div>
+		</div>
+	</div>
+</dialog>
+
+<script>
+	(function() {
+		if (window.reconnectModalInitialized) return;
+		window.reconnectModalInitialized = true;
+
+		let serverReallyDown = false;
+		let checkInterval = null;
+
+		async function checkServerStatus() {
+			try {
+				// Add timestamp to prevent browser caching
+				const probeUrl = `/_framework/blazor.web.js?t=${new Date().getTime()}`;
+				console.log(`[Reconnect] Probing: ${probeUrl}`);
+
+				const response = await fetch(probeUrl, {
+					method: 'HEAD',
+					cache: 'no-store'
+				});
+
+				console.log('[Reconnect] Response status:', response.status);
+
+				// === Core fix starts ===
+				// Only reload when status code is 200 (OK).
+				// Nginx usually returns 502/503/504 during container restart, fetch won't throw an exception,
+				// so must manually check response.ok or response.status
+				if (response.ok) {
+					console.log('[Reconnect] Server is ready (200 OK). Reloading...');
+					window.location.reload();
+				} else {
+					// If it's 500, 502, 503, 504, 404, etc., it means the service hasn't fully recovered
+					// Throw an error to enter the catch block, keep the modal and wait for the next probe
+					throw new Error(`Server returned status ${response.status} (Not Ready)`);
+				}
+				// === Core fix ends ===
+
+			} catch (error) {
+				// Only when reaching here, it's truly "network unreachable" or "service not ready"
+				console.warn('[Reconnect] Probe failed or server not ready:', error);
+
+				if (!serverReallyDown) {
+					serverReallyDown = true;
+					// Update the text to tell the user the server is restarting
+					updateStatus("Server Restarting", "Waiting for the application to start...");
+
+					// Lock the modal
+					const modal = document.getElementById('components-reconnect-modal');
+					if (modal && !modal.open) modal.showModal();
+				}
+			}
+		}
+
+		function updateStatus(title, desc) {
+			const titleEl = document.getElementById('reconnect-title');
+			const descEl = document.getElementById('reconnect-desc');
+			if (titleEl) titleEl.innerText = title;
+			if (descEl) descEl.innerHTML = desc;
+		}
+
+		function init() {
+			const modal = document.getElementById('components-reconnect-modal');
+			if (!modal) { setTimeout(init, 50); return; }
+
+			const observer = new MutationObserver((mutations) => {
+				const activeClasses = ['components-reconnect-show', 'components-reconnect-failed', 'components-reconnect-rejected'];
+				const hasClass = activeClasses.some(c => modal.classList.contains(c));
+
+				if (hasClass) {
+					// Blazor reports disconnection
+					if (!modal.open) {
+						modal.showModal();
+						// Suggest slightly extending the probe interval to avoid excessive pressure on the server during restart
+						if (!checkInterval) checkInterval = setInterval(checkServerStatus, 2000);
+						checkServerStatus(); // Probe once immediately
+					}
+				} else {
+					// Blazor reports recovery
+					if (serverReallyDown) {
+						// If previously confirmed server was down, absolutely do not allow closing, wait for checkServerStatus to trigger reload
+						console.log('[Reconnect] Ignored fake reconnection signal. Waiting for reload.');
+						if (!modal.open) modal.showModal();
+					} else {
+						// Minor network fluctuation, allow closing
+						if (modal.open) modal.close();
+						if (checkInterval) { clearInterval(checkInterval); checkInterval = null; }
+					}
+				}
+			});
+
+			observer.observe(modal, { attributes: true, attributeFilter: ['class'] });
+		}
+
+		if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+		else init();
+	})();
+</script>
+
+<style>
+
+	:root {
+		--rc-bg: rgba(255, 255, 255, 0.92);
+		--rc-border: rgba(0, 0, 0, 0.08);
+		--rc-text: #0f172a;
+		--rc-sub: #64748b;
+		--rc-primary: #2563eb;
+		--rc-glow: rgba(37, 99, 235, 0.25);
+		--rc-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.2);
+		--rc-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+	}
+
+	@@media (prefers-color-scheme: dark) {
+		:root {
+			--rc-bg: rgba(15, 23, 42, 0.92);
+			--rc-border: rgba(255, 255, 255, 0.1);
+			--rc-text: #f8fafc;
+			--rc-sub: #94a3b8;
+			--rc-primary: #3b82f6;
+			--rc-glow: rgba(59, 130, 246, 0.25);
+			--rc-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.6);
+		}
+	}
+
+	.components-reconnect-show, .components-reconnect-failed, .components-reconnect-rejected {
+	}
+
+	#components-reconnect-modal {
+		position: fixed;
+		inset: 0;
+		width: 100vw;
+		height: 100vh;
+		max-width: 100vw;
+		max-height: 100vh;
+		background: transparent !important;
+		border: none;
+		padding: 0;
+		margin: 0;
+		z-index: 2147483647;
+		display: none;
+		align-items: center;
+		justify-content: center;
+		opacity: 0;
+		transition: opacity 0.3s ease;
+		pointer-events: none;
+	}
+
+		#components-reconnect-modal[open] {
+			display: flex;
+			opacity: 1;
+			pointer-events: auto;
+		}
+
+		#components-reconnect-modal::backdrop {
+			background: rgba(0, 0, 0, 0.45);
+			backdrop-filter: blur(8px);
+			-webkit-backdrop-filter: blur(8px);
+			animation: fadeIn 0.4s ease-out;
+		}
+
+	.glass-panel {
+		background: var(--rc-bg);
+		border: 1px solid var(--rc-border);
+		box-shadow: var(--rc-shadow);
+		width: 90%;
+		max-width: 340px;
+		border-radius: 24px;
+		padding: 40px 30px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+		transform: scale(0.92) translateY(10px);
+		animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+		font-family: var(--rc-font);
+	}
+
+	.icon-wrapper {
+		position: relative;
+		width: 80px;
+		height: 80px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin-bottom: 24px;
+	}
+
+	.status-icon {
+		width: 40px;
+		height: 40px;
+		color: var(--rc-primary);
+		z-index: 2;
+		filter: drop-shadow(0 4px 12px var(--rc-glow));
+	}
+
+	.pulse-ring {
+		position: absolute;
+		inset: 0;
+		border-radius: 50%;
+		border: 2px solid var(--rc-primary);
+		opacity: 0;
+		animation: ripple 2s infinite ease-out;
+	}
+
+	.status-title {
+		margin: 0 0 8px;
+		font-size: 1.25rem;
+		font-weight: 700;
+		color: var(--rc-text);
+		letter-spacing: -0.01em;
+	}
+
+	.status-desc {
+		margin: 0;
+		font-size: 0.95rem;
+		color: var(--rc-sub);
+		line-height: 1.5;
+	}
+
+	.sub-text {
+		font-size: 0.85rem;
+		opacity: 0.8;
+		margin-top: 4px;
+		display: block;
+	}
+
+	.progress-container {
+		width: 100%;
+		height: 4px;
+		background: rgba(128, 128, 128, 0.1);
+		border-radius: 100px;
+		overflow: hidden;
+		margin-top: 32px;
+	}
+
+	.progress-bar {
+		width: 100%;
+		height: 100%;
+		background: var(--rc-primary);
+		transform-origin: left;
+		animation: indeterminate 1.5s infinite cubic-bezier(0.65, 0.815, 0.735, 0.395);
+	}
+
+	@@keyframes fadeIn {
+		from {
+			opacity: 0;
+		}
+
+		to {
+			opacity: 1;
+		}
+	}
+	@@keyframes slideUp {
+		to {
+			transform: scale(1) translateY(0);
+		}
+	}
+	@@keyframes ripple {
+		0% {
+			transform: scale(0.8);
+			opacity: 0.5;
+			border-width: 4px;
+		}
+
+		100% {
+			transform: scale(1.4);
+			opacity: 0;
+			border-width: 0px;
+		}
+	}
+	@@keyframes indeterminate {
+		0% {
+			transform: translateX(-100%);
+		}
+
+		60% {
+			transform: translateX(50%);
+		}
+
+		100% {
+			transform: translateX(100%);
+		}
+	}
+</style>

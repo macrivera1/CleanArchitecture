@@ -1,0 +1,264 @@
+﻿@page "/"
+@using MudBlazor.Utilities
+@inject IStringLocalizer<Dashboard> L
+
+<PageTitle>@Title</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-4 mb-8">
+
+	<!-- HEADER SECTION -->
+	<div class="d-flex justify-space-between align-center mb-6">
+		<div>
+			<MudText Typo="Typo.h5" Class="fw-bold">@Title</MudText>
+			<MudText Typo="Typo.body2" Class="mud-text-secondary">System Status & Financial Overview</MudText>
+		</div>
+		<!-- Action Buttons -->
+		<MudStack Row="true" Spacing="2">
+			<MudButton Variant="Variant.Outlined" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.DateRange">Last 30 Days</MudButton>
+			<MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Download">Export Report</MudButton>
+		</MudStack>
+	</div>
+
+	<MudGrid Spacing="3">
+
+		<!-- SECTION 1: FINANCIAL OVERVIEW (Donut Chart) -->
+		<MudItem xs="12">
+			<MudPaper Outlined="true" Class="pa-6">
+				<MudGrid>
+					<!-- Left: Main Stats -->
+					<MudItem xs="12" md="4" Class="d-flex flex-column justify-center border-end-md">
+						<MudText Typo="Typo.overline" Class="mud-text-secondary">Total Invoiced Amount</MudText>
+						<MudText Typo="Typo.h3" Color="Color.Primary" Class="my-2">1,167,986 €</MudText>
+						<div class="d-flex align-center gap-1">
+							<MudIcon Icon="@Icons.Material.Filled.TrendingUp" Color="Color.Success" Size="Size.Small" />
+							<MudText Typo="Typo.body2" Color="Color.Success" Class="fw-bold">+12.4%</MudText>
+							<MudText Typo="Typo.caption" Class="mud-text-secondary ml-1">vs last month</MudText>
+						</div>
+					</MudItem>
+
+					<!-- Center: Donut Chart -->
+					<MudItem xs="12" md="4" Class="d-flex justify-center align-center">
+						<MudChart ChartType="ChartType.Donut" Width="140px" Height="140px"
+								  InputData="@ChartData" InputLabels="@ChartLabels" LegendPosition="Position.Right" />
+					</MudItem>
+
+					<!-- Right: Detailed Breakdown -->
+					<MudItem xs="12" md="4" Class="d-flex flex-column justify-center px-4">
+						<MudText Typo="Typo.subtitle2" Class="mb-3">Payment Status Breakdown</MudText>
+						<MudStack Spacing="2">
+							<div class="d-flex justify-space-between">
+								<MudText Typo="Typo.caption"><MudIcon Icon="@Icons.Material.Filled.Circle" Size="Size.Small" Color="Color.Success" Class="mr-1" /> Paid in full</MudText>
+								<MudText Typo="Typo.caption" Class="fw-bold">789,238 €</MudText>
+							</div>
+							<div class="d-flex justify-space-between">
+								<MudText Typo="Typo.caption"><MudIcon Icon="@Icons.Material.Filled.Circle" Size="Size.Small" Color="Color.Info" Class="mr-1" /> Awaiting</MudText>
+								<MudText Typo="Typo.caption" Class="fw-bold">244,900 €</MudText>
+							</div>
+							<div class="d-flex justify-space-between">
+								<MudText Typo="Typo.caption"><MudIcon Icon="@Icons.Material.Filled.Circle" Size="Size.Small" Color="Color.Warning" Class="mr-1" /> Overdue</MudText>
+								<MudText Typo="Typo.caption" Class="fw-bold">133,848 €</MudText>
+							</div>
+							<MudProgressLinear Color="Color.Primary" Value="75" Class="mt-2" Rounded="true" Size="Size.Small" />
+						</MudStack>
+					</MudItem>
+				</MudGrid>
+			</MudPaper>
+		</MudItem>
+
+		<!-- SECTION 2: KPI CARDS (Simulated Sparklines) -->
+		<!-- Card 1: Network Traffic (Blue / Smooth Line) -->
+		<MudItem xs="12" sm="6" md="4">
+			<MudPaper Outlined="true" Class="pa-4 d-flex flex-column" Style="height: 100%;">
+				<div class="d-flex justify-space-between align-start mb-2">
+					<div>
+						<MudText Typo="Typo.subtitle2" Class="mud-text-secondary">@L["Total Requests"]</MudText>
+						<MudText Typo="Typo.h4" Class="mt-1">2.4M</MudText>
+					</div>
+					<MudAvatar Color="Color.Primary" Variant="Variant.Filled" Rounded="true">
+						<MudIcon Icon="@Icons.Material.Filled.CloudQueue" />
+					</MudAvatar>
+				</div>
+
+
+
+				<div class="d-flex align-center gap-2 mt-2">
+					<MudChip T="string" Color="Color.Success" Size="Size.Small" Variant="Variant.Text" Icon="@Icons.Material.Filled.ArrowUpward">+14.2%</MudChip>
+					<MudText Typo="Typo.caption" Class="mud-text-secondary">Traffic peak reached</MudText>
+				</div>
+			</MudPaper>
+		</MudItem>
+
+		<!-- Card 2: CPU Load (Orange / Sharp Line) -->
+		<MudItem xs="12" sm="6" md="4">
+			<MudPaper Outlined="true" Class="pa-4 d-flex flex-column" Style="height: 100%;">
+				<div class="d-flex justify-space-between align-start mb-2">
+					<div>
+						<MudText Typo="Typo.subtitle2" Class="mud-text-secondary">@L["Avg. CPU Load"]</MudText>
+						<MudText Typo="Typo.h4" Class="mt-1">84%</MudText>
+					</div>
+					<MudAvatar Color="Color.Warning" Variant="Variant.Filled" Rounded="true">
+						<MudIcon Icon="@Icons.Material.Filled.Memory" />
+					</MudAvatar>
+				</div>
+
+
+
+				<div class="d-flex align-center gap-2 mt-2">
+					<MudChip T="string" Color="Color.Warning" Size="Size.Small" Variant="Variant.Text" Icon="@Icons.Material.Filled.TrendingUp">+5.4%</MudChip>
+					<MudText Typo="Typo.caption" Class="mud-text-secondary">High load warning</MudText>
+				</div>
+			</MudPaper>
+		</MudItem>
+
+		<!-- Card 3: Storage (Secondary / Bar Chart) -->
+		<MudItem xs="12" sm="6" md="4">
+			<MudPaper Outlined="true" Class="pa-4 d-flex flex-column" Style="height: 100%;">
+				<div class="d-flex justify-space-between align-start mb-2">
+					<div>
+						<MudText Typo="Typo.subtitle2" Class="mud-text-secondary">@L["Storage Usage"]</MudText>
+						<MudText Typo="Typo.h4" Class="mt-1">64%</MudText>
+					</div>
+					<MudAvatar Color="Color.Secondary" Variant="Variant.Filled" Rounded="true">
+						<MudIcon Icon="@Icons.Material.Filled.Storage" />
+					</MudAvatar>
+				</div>
+
+
+
+				<div class="d-flex align-center gap-2 mt-2">
+					<MudChip T="string" Color="Color.Default" Size="Size.Small" Variant="Variant.Text">Stable</MudChip>
+					<MudText Typo="Typo.caption" Class="mud-text-secondary">12TB Available</MudText>
+				</div>
+			</MudPaper>
+		</MudItem>
+
+		<!-- SECTION 3: BOTTOM DETAILS -->
+		<!-- Left: Core Telemetry (Progress Bars) -->
+		<MudItem xs="12" md="4">
+			<MudPaper Outlined="true" Class="pa-4 h-100 d-flex flex-column">
+				<div class="d-flex justify-space-between align-center mb-6">
+					<div>
+						<MudText Typo="Typo.h6">@L["Core Telemetry"]</MudText>
+						<MudText Typo="Typo.caption" Class="mud-text-secondary">Real-time sensor data</MudText>
+					</div>
+					<MudIcon Icon="@Icons.Material.Filled.Sensors" Color="Color.Primary" />
+				</div>
+
+				<MudStack Spacing="4" Class="flex-grow-1">
+					<!-- Metric 1 -->
+					<div>
+						<div class="d-flex justify-space-between mb-1">
+							<MudText Typo="Typo.body2" Class="mud-text-secondary">Core Temperature</MudText>
+							<MudText Typo="Typo.body2" Color="Color.Warning" Class="fw-bold">892°C</MudText>
+						</div>
+						<MudProgressLinear Color="Color.Warning" Value="78" Rounded="true" Size="Size.Small" Striped="true" />
+					</div>
+
+					<!-- Metric 2 -->
+					<div>
+						<div class="d-flex justify-space-between mb-1">
+							<MudText Typo="Typo.body2" Class="mud-text-secondary">Water Pressure</MudText>
+							<MudText Typo="Typo.body2" Color="Color.Success" Class="fw-bold">120 bar</MudText>
+						</div>
+						<MudProgressLinear Color="Color.Success" Value="92" Rounded="true" Size="Size.Small" />
+					</div>
+
+					<!-- Metric 3 -->
+					<div>
+						<div class="d-flex justify-space-between mb-1">
+							<MudText Typo="Typo.body2" Class="mud-text-secondary">Turbine Load</MudText>
+							<MudText Typo="Typo.body2" Color="Color.Primary" Class="fw-bold">880 MW</MudText>
+						</div>
+						<MudProgressLinear Color="Color.Primary" Value="88" Rounded="true" Size="Size.Small" />
+					</div>
+				</MudStack>
+
+				<div class="mt-auto pt-4">
+					<MudAlert Severity="Severity.Info" NoIcon="true" Dense="true" Class="py-1">System operating within nominal parameters.</MudAlert>
+				</div>
+			</MudPaper>
+		</MudItem>
+
+		<!-- Right: Periodic Table (MudTable) -->
+		<MudItem xs="12" md="8">
+			<MudTable Items="@Elements" Hover="true" Breakpoint="Breakpoint.Sm" Dense="true" Outlined="true" Elevation="0">
+				<ToolBarContent>
+					<MudText Typo="Typo.h6">Chemical Elements</MudText>
+					<MudSpacer />
+					<MudIconButton Icon="@Icons.Material.Filled.FilterList" Size="Size.Small" />
+				</ToolBarContent>
+				<HeaderContent>
+					<MudTh>@L["Nr"]</MudTh>
+					<MudTh>@L["Sign"]</MudTh>
+					<MudTh>@L["Name"]</MudTh>
+					<MudTh>@L["Position"]</MudTh>
+					<MudTh Style="text-align:right">@L["Molar mass"]</MudTh>
+				</HeaderContent>
+				<RowTemplate>
+					<MudTd DataLabel="Nr">@context.Number</MudTd>
+					<MudTd DataLabel="Sign">
+						<!-- Avatar creates a tech-badge look for the sign -->
+						<MudAvatar Size="Size.Small" Color="@GetElementColor(context.Sign)" Variant="Variant.Outlined" Class="fw-bold">
+							@context.Sign
+						</MudAvatar>
+					</MudTd>
+					<MudTd DataLabel="Name" Class="fw-semibold">@context.Name</MudTd>
+					<MudTd DataLabel="Position">@context.Position</MudTd>
+					<MudTd DataLabel="Molar" Style="text-align:right; font-family: monospace;">@context.Molar</MudTd>
+				</RowTemplate>
+
+			</MudTable>
+		</MudItem>
+
+	</MudGrid>
+</MudContainer>
+
+
+@code
+{
+	public string Title { get; set; } = "Dashboard";
+
+	// --- FINANCIAL CHART DATA ---
+	public double[] ChartData = { 68, 21, 11 };
+	public string[] ChartLabels = { "Paid", "Awaiting", "Overdue" };
+
+
+
+
+
+
+	// --- TABLE DATA ---
+
+	private IEnumerable<Element> Elements = new List<Element>
+	{
+		new() { Number = 1, Sign = "H", Name = "Hydrogen", Position = 0, Molar = 1.00794 },
+		new() { Number = 2, Sign = "He", Name = "Helium", Position = 17, Molar = 4.002602 },
+		new() { Number = 3, Sign = "Li", Name = "Lithium", Position = 0, Molar = 6.941 },
+		new() { Number = 4, Sign = "Be", Name = "Beryllium", Position = 1, Molar = 9.012182 },
+		new() { Number = 5, Sign = "C", Name = "Carbon", Position = 13, Molar = 12.0107 },
+	};
+
+	public class Element
+	{
+		public int Position { get; set; }
+		public string? Name { get; set; }
+		public int Number { get; set; }
+		public string? Sign { get; set; }
+		public double Molar { get; set; }
+	}
+
+	// Helper to determine avatar color based on element
+	private Color GetElementColor(string sign)
+	{
+		if (sign == "H" || sign == "O") return Color.Info;
+		if (sign == "C") return Color.Success;
+		if (sign == "U") return Color.Warning;
+		return Color.Default;
+	}
+
+	protected override void OnInitialized()
+	{
+		// Simulate localized title
+		Title = $"{ApplicationSettings.AppName} - {L["Dashboard"]}";
+	}
+}

@@ -1,0 +1,103 @@
+﻿html {
+    font-size: 14px; /* 默认：1rem = 14px */
+}
+
+.mud-main-content {
+    height: 100%;
+    min-height: 100vh;
+    display: flex;
+}
+
+.mud-chip.mud-chip-size-medium {
+    font-size: var(--mud-typography-default-size) !important;
+}
+
+.mud-chip.mud-chip-size-small {
+    font-size: var(--mud-typography-body2-size) !important;
+}
+
+.mud-chip {
+    font-size: var(--mud-typography-default-size);
+}
+
+.mud-tabs {
+    background-color: var(--mud-palette-surface);
+}
+
+.mud-input-control-margin-dense .mud-input > input.mud-input-root,
+.mud-input-control-margin-dense div.mud-input-slot.mud-input-root {
+    font-size: 0.90em;
+}
+
+.mud-input-control > .mud-input-control-input-container > .mud-input-label-inputcontrol {
+    font-size: var(--mud-typography-default-size) !important;
+}
+
+
+.mud-simple-table table * tr > td, .mud-simple-table table * tr th {
+    font-size: var(--mud-typography-default-size) !important;
+}
+
+.mud-expand-panel .mud-expand-panel-header {
+    font-size: var(--mud-typography-default-size) !important;
+}
+
+.mud-button-year {
+    font-size: var(--mud-typography-default-size) !important;
+}
+
+.mud-table-cell {
+    font-size: var(--mud-typography-default-size) !important;
+}
+
+.mud-table-dense .mud-table-cell {
+    font-size: var(--mud-typography-body2-size) !important;
+}
+
+
+.mud-button-outlined-size-small {
+    font-size: var(--mud-typography-body2-size);
+}
+
+.mud-grid.readonly-grid > .mud-grid-item {
+    border-bottom: 1px solid var(--mud-palette-table-lines);
+    padding-bottom: 2px;
+}
+
+.mud-nav-link {
+    white-space: normal !important;
+}
+
+.user-button {
+    text-transform: none;
+    background: rgba(var(--mud-palette-primary-rgb), 0.1)
+}
+
+.side-menu .mud-chip.mud-chip-size-small {
+    font-size: 0.625rem;
+    height: 1.125rem;
+}
+
+.mud-table.mud-data-grid .mud-toolbar {
+    height: auto !important;
+    padding: 1rem
+}
+
+
+.mud-table.mud-data-grid .mud-toolbar-gutters {
+    height: auto !important;
+    padding: 1rem
+}
+
+.mud-table.mud-data-grid .mud-table-toolbar {
+    height: auto !important;
+    padding: 1rem
+}
+
+.mud-table.mud-data-grid .mud-table-pagination-toolbar {
+    height: auto !important;
+    padding: 0rem !important;
+}
+
+
+
